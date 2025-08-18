@@ -1,16 +1,11 @@
-# app.py
-import sys
 import argparse
-from typing import Any, Iterable
+import typing as t
 
 from core.types import Type, Doc, List  # keep using your simple Type + List
 from core.engine import suggest_actions, execute
 from core.actions import register_action  # for builtin demo actions
 from fileio.files import load_doc
 
-# -----------------------
-# Built-in demo actions
-# -----------------------
 @register_action("summarize", Doc, Doc)
 def summarize(doc):
     return type("X", (object,), {"path": doc.path, "text": doc.text[:100] + "..."})
@@ -20,25 +15,23 @@ def extract_titles(doc):
     lines = [l.strip() for l in doc.text.splitlines() if l.strip().startswith("#")]
     return [type("X", (object,), {"path": doc.path, "text": l}) for l in lines]
 
-# -----------------------
-# Helpers
-# -----------------------
 def type_name(t: Type) -> str:
-    if t.param:
-        return f"{t.name}[{type_name(t.param)}]"
+    if t.params:
+        param_str = ", ".join(type_name(p) for p in t.params)
+        return f"{t.name}[{param_str}]"
     return t.name
 
-def print_handle(t: Type, v: Any):
+def print_handle(t: Type, v: t.Any):
     if t.name == "Doc" and hasattr(v, "text"):
         snippet = (v.text[:120] + "...") if len(v.text) > 120 else v.text
         print(f"→ Handle: {type_name(t)}  ({len(snippet)} chars)  from: {getattr(v, 'path', '—')}")
     elif t.name == "List":
-        n = len(v) if isinstance(v, Iterable) else "?"
+        n = len(v) if isinstance(v, t.Iterable) else "?"
         print(f"→ Handle: {type_name(t)}  ({n} items)")
     else:
         print(f"→ Handle: {type_name(t)}")
 
-def pretty_print(t: Type, v: Any):
+def pretty_print(t: Type, v: t.Any):
     if t.name == "Doc" and hasattr(v, "text"):
         print(v.text)
     elif t.name == "List":
@@ -53,7 +46,7 @@ def available_action_names(t: Type):
     acts = suggest_actions(t)
     return list(acts.keys())
 
-def run_action_or_error(name: str, t: Type, v: Any):
+def run_action_or_error(name: str, t: Type, v: t.Any):
     acts = suggest_actions(t)
     if name not in acts:
         valid = ", ".join(sorted(acts.keys())) or "(none)"
@@ -61,7 +54,7 @@ def run_action_or_error(name: str, t: Type, v: Any):
     out_t, out_v = execute(name, v)
     return out_t, out_v
 
-def run_pipeline(pipe: str, t: Type, v: Any):
+def run_pipeline(pipe: str, t: Type, v: t.Any):
     """
     pipe string like: "summarize"  or  "extract_titles"
     (You can chain later once you add actions that match types across steps.)
@@ -74,7 +67,7 @@ def run_pipeline(pipe: str, t: Type, v: Any):
         print(f"   ✓ OutputType: {type_name(curr_t)}")
     return curr_t, curr_v
 
-def repl(t: Type, v: Any):
+def repl(t: Type, v: t.Any):
     print("\nEntering REPL. Type an action name to run it.")
     print("Commands: ':q' to quit, ':ls' to list actions, ':type' to show current type.")
     curr_t, curr_v = t, v
