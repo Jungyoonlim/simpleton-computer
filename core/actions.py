@@ -1,23 +1,18 @@
-from typing import Callable, Dict, Tuple, List as PyList
+import typing as t 
 from core.types import Type, Doc, List, Comment, Unit
 from fileio.files import parse_comments, CommentValue
 
-_registry: Dict[str, Tuple[Type, Type, Callable]] = {}
+_registry: t.Dict[str, t.Tuple[Type, Type, t.Callable]] = {}
 
 def register_action(name: str, input_t: Type, output_t: Type):
-    def deco(fn: Callable):
+    def deco(fn: t.Callable):
         _registry[name] = (input_t, output_t, fn)
         return fn 
     return deco
 
-def list_actions_for(t: Type):
-    from core.types import unify  # if you have a unify; else do simple name match
-    def _unify(a: Type, b: Type) -> bool:
-        # minimal structural match
-        if a.name != b.name: return False
-        if a.param and b.param: return _unify(a.param, b.param)
-        return (a.param is None) and (b.param is None)
-    return {name: (inp, out) for name, (inp, out, _) in _registry.items() if _unify(inp, t)}
+def list_actions_for(t_: Type):
+    from core.types import unify
+    return {name: (inp, out) for name, (inp, out, _) in _registry.items() if unify(inp, t_)}
 
 def run(name: str, value):
     inp_t, out_t, fn = _registry[name]
@@ -29,13 +24,13 @@ def extract_comments(doc):
     return parse_comments(doc)
 
 @register_action("filter_author_me", List(Comment), List(Comment))
-def filter_author_me(comments: PyList[CommentValue]):
+def filter_author_me(comments: t.List[CommentValue]):
     """List[Comment] -> List[Comment]; demo filter"""
     me_aliases = {"me", "joanne", "jungyoon", "jungyoon lim"}
     return [c for c in comments if c.author.strip().lower() in me_aliases]
 
 @register_action("filter_last_10_days", List(Comment), List(Comment))
-def filter_last_10_days(comments: PyList[CommentValue]):
+def filter_last_10_days(comments: t.List[CommentValue]):
     """List[Comment] -> List[Comment]; keeps comments with date within last 10 days (naive ISO compare)"""
     # quick-and-dirty: compare strings; good enough if month boundaries are sane
     import datetime as dt
@@ -43,7 +38,7 @@ def filter_last_10_days(comments: PyList[CommentValue]):
     return [c for c in comments if c.date >= cutoff]
 
 @register_action("delete_all", List(Comment), Unit)
-def delete_all(comments: PyList[CommentValue]):
+def delete_all(comments: t.List[CommentValue]):
     """List[Comment] -> Unit; simulate deletion (side-effect)"""
     # In a real editor, you'd rewrite the file without these comment lines.
     # For now, just print what would be deleted.
