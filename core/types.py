@@ -119,43 +119,44 @@ def Promise(t_: Type) -> Type:
     return Type("Promise", [t_])
 
 @dataclass(frozen=True)
-class TVar(type):
-    def __init__(self, name: str):
-        super().__init__(name=f"TVar({name})")
+class TVar(Type):
+    def __init__(self, varname: str):
+        # Keep a readable name, but store the logical name separately
+        super().__init__(name=f"TVar({varname})", params=[], metadata={"tvar": varname})
 
 def is_tvar(t_: Type) -> bool:
     return isinstance(t_, TVar)
 
 # Unification
 def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Union[bool, dict]:
-    """Unify 'a' with 'b'. Returns False or a substitution dict for TVars."""
     subst = {} if subst is None else dict(subst)
 
     # Top matches anything
     if a.name == "Top" or b.name == "Top":
         return subst
 
-    # Context unwrap
+    # Context unwrap (keep your versions)
     if a.name == "Context" and a.params:
         return unify(a.params[0], b, subst)
     if b.name == "Context" and b.params:
         return unify(a, b.params[0], subst)
 
-    # Type-vars
+    # --- Type variables ---
     if is_tvar(a):
-        bound = subst.get(a.name)
-        if bound:  # already bound
-            return unify(bound, b, subst)
-        subst[a.name] = b
-        return subst
-    if is_tvar(b):
-        bound = subst.get(b.name)
-        if bound:
-            return unify(a, bound, subst)
-        subst[b.name] = a
+        key = a.metadata["tvar"]
+        if key in subst:
+            return unify(subst[key], b, subst)
+        subst[key] = b
         return subst
 
-    # Names must match
+    if is_tvar(b):
+        key = b.metadata["tvar"]
+        if key in subst:
+            return unify(a, subst[key], subst)
+        subst[key] = a
+        return subst
+
+    # Names/arity must match
     if a.name != b.name or len(a.params) != len(b.params):
         return False
 
