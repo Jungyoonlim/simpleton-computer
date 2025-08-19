@@ -59,30 +59,6 @@ def Map(key_t: Type, value_t: Type) -> Type:   # <-- rename from Dict to avoid s
 def Set(t_: Type) -> Type:
     return Type("Set", [t_])
 
-# Domain Types
-Doc = Type("Doc", metadata={"icon": "📄", "description": "A text document"})
-Comment = Type("Comment", metadata={"icon": "💬", "description": "A comment or annotation"})
-Image = Type("Image", metadata={"icon": "🖼️", "description": "An image file"})
-Audio = Type("Audio", metadata={"icon": "🎵", "description": "Audio content"})
-Video = Type("Video", metadata={"icon": "🎬", "description": "Video content"})
-Table = Type("Table", metadata={"icon": "📊", "description": "Tabular data"})
-Code = Type("Code", metadata={"icon": "💻", "description": "Source code"})
-Email = Type("Email", metadata={"icon": "📧", "description": "Email message"})
-Event = Type("Event", metadata={"icon": "📅", "description": "Calendar event"})
-Task = Type("Task", metadata={"icon": "✅", "description": "A task or todo item"})
-Note = Type("Note", metadata={"icon": "📝", "description": "A note or memo"})
-
-# Financial Domain Types
-Currency = Type("Currency", metadata={"icon": "💱", "description": "Currency code (USD, EUR, etc.)"})
-Account = Type("Account", metadata={"icon": "🏦", "description": "Bank account"})
-Amount = Type("Amount", metadata={"icon": "💰", "description": "Monetary amount"})
-FxQuote = Type("FxQuote", metadata={"icon": "📊", "description": "Foreign exchange quote"})
-Fee = Type("Fee", metadata={"icon": "💸", "description": "Transaction fee"})
-Transaction = Type("Transaction", metadata={"icon": "💳", "description": "Financial transaction"})
-
-# UI/Interaction Types
-Selection = Type("Selection", metadata={"ui_hint": "user_selection", "icon": "👆"})
-Cursor = Type("Cursor", metadata={"ui_hint": "cursor_position", "icon": "➤"})
 
 def Range(start_t: Type | None = None, end_t: Type | None = None) -> Type:
     start_t = start_t or Int
@@ -118,7 +94,6 @@ def Stream(t_: Type) -> Type:
 def Promise(t_: Type) -> Type:
     return Type("Promise", [t_])
 
-@dataclass(frozen=True)
 class TVar(Type):
     def __init__(self, varname: str):
         # Keep a readable name, but store the logical name separately
