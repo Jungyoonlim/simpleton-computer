@@ -1,9 +1,9 @@
 import argparse
 import typing as t
 
-from core.types import Type, Doc, List  # keep using your simple Type + List
+from core.types import Type, Doc, List  
 from core.engine import suggest_actions, execute
-from core.actions import register_action  # for builtin demo actions
+from core.actions import register_action  
 from fileio.files import load_doc
 
 @register_action("summarize", Doc, Doc)

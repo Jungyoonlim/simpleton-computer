@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-import typing as t   # <-- avoid shadowing; use t.Any, t.Dict, etc.
+import typing as t  
 
 @dataclass(frozen=True)
 class Type:
     name: str
-    params: t.List['Type'] = field(default_factory=list)     # <-- 'Type' as string
-    metadata: t.Dict[str, t.Any] = field(default_factory=dict)  # <-- t.Any
+    params: t.List['Type'] = field(default_factory=list)     
+    metadata: t.Dict[str, t.Any] = field(default_factory=dict) 
+
+    @property
+    def carrier(self):
+        return self.metadata.get("py")
 
     def __str__(self):
         if not self.params:
@@ -68,6 +72,14 @@ Event = Type("Event", metadata={"icon": "📅", "description": "Calendar event"}
 Task = Type("Task", metadata={"icon": "✅", "description": "A task or todo item"})
 Note = Type("Note", metadata={"icon": "📝", "description": "A note or memo"})
 
+# Financial Domain Types
+Currency = Type("Currency", metadata={"icon": "💱", "description": "Currency code (USD, EUR, etc.)"})
+Account = Type("Account", metadata={"icon": "🏦", "description": "Bank account"})
+Amount = Type("Amount", metadata={"icon": "💰", "description": "Monetary amount"})
+FxQuote = Type("FxQuote", metadata={"icon": "📊", "description": "Foreign exchange quote"})
+Fee = Type("Fee", metadata={"icon": "💸", "description": "Transaction fee"})
+Transaction = Type("Transaction", metadata={"icon": "💳", "description": "Financial transaction"})
+
 # UI/Interaction Types
 Selection = Type("Selection", metadata={"ui_hint": "user_selection", "icon": "👆"})
 Cursor = Type("Cursor", metadata={"ui_hint": "cursor_position", "icon": "➤"})
@@ -106,29 +118,53 @@ def Stream(t_: Type) -> Type:
 def Promise(t_: Type) -> Type:
     return Type("Promise", [t_])
 
+@dataclass(frozen=True)
+class TVar(type):
+    def __init__(self, name: str):
+        super().__init__(name=f"TVar({name})")
+
+def is_tvar(t_: Type) -> bool:
+    return isinstance(t_, TVar)
+
 # Unification
-def unify(a: Type, b: Type) -> bool:
-    """Check if type 'a' can unify with type 'b'"""
-    # Handle Top type
+def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Union[bool, dict]:
+    """Unify 'a' with 'b'. Returns False or a substitution dict for TVars."""
+    subst = {} if subst is None else dict(subst)
+
+    # Top matches anything
     if a.name == "Top" or b.name == "Top":
-        return True
-    
-    # Handle Context unwrapping
+        return subst
+
+    # Context unwrap
     if a.name == "Context" and a.params:
-        return unify(a.params[0], b)
+        return unify(a.params[0], b, subst)
     if b.name == "Context" and b.params:
-        return unify(a, b.params[0])
-    
-    # Basic name check
-    if a.name != b.name:
+        return unify(a, b.params[0], subst)
+
+    # Type-vars
+    if is_tvar(a):
+        bound = subst.get(a.name)
+        if bound:  # already bound
+            return unify(bound, b, subst)
+        subst[a.name] = b
+        return subst
+    if is_tvar(b):
+        bound = subst.get(b.name)
+        if bound:
+            return unify(a, bound, subst)
+        subst[b.name] = a
+        return subst
+
+    # Names must match
+    if a.name != b.name or len(a.params) != len(b.params):
         return False
-    
-    # Check parameters
-    if len(a.params) != len(b.params):
-        return False
-    
-    # Recursively unify parameters
-    return all(unify(ap, bp) for ap, bp in zip(a.params, b.params))
+
+    # Recurse
+    for ap, bp in zip(a.params, b.params):
+        subst = unify(ap, bp, subst)
+        if subst is False:
+            return False
+    return subst
 
 # Helper functions
 def is_container_type(t_: Type) -> bool:
