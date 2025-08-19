@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import typing as t  
 
+
 @dataclass(frozen=True)
 class Type:
     name: str
@@ -142,26 +143,6 @@ def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Union[bool, dict]
             return False
     return subst
 
-# Helper functions
-def is_container_type(t_: Type) -> bool:
-    """Check if a type is a container type"""
-    return t_.name in {"List", "Set", "Map", "Option", "Tuple", "Stream"}
-
-def get_element_type(t_: Type) -> t.Optional[Type]:
-    """Get the element type of a container"""
-    if t_.name in {"List", "Set", "Option", "Stream"} and t_.params:
-        return t_.params[0]
-    return None
-
-def is_function_type(t_: Type) -> bool:
-    """Check if a type is a function type"""
-    return t_.name == "Function" and len(t_.params) == 2
-
-def get_function_signature(t_: Type) -> t.Optional[t.Tuple[Type, Type]]:
-    """Get input and output types of a function"""
-    if is_function_type(t_):
-        return (t_.params[0], t_.params[1])
-    return None
 
 def lift_to_list(t_: Type) -> Type:
     """Lift a type to a list type if not already"""
