@@ -103,8 +103,18 @@ class TVar(Type):
 def is_tvar(t_: Type) -> bool:
     return isinstance(t_, TVar)
 
+def occurs(var: str, t: Type, subst: dict) -> bool:
+    """Does TVar(var) appear inside type t under current substitution subst?"""
+    if is_tvar(t):
+        v = t.metadata["tvar"]
+        if v == var: 
+            return True
+        return v in subst and occurs(var, subst[v], subst)
+    return any(occurs(var, p, subst) for p in t.params)
+
 # Unification
 def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Union[bool, dict]:
+    """"""
     subst = {} if subst is None else dict(subst)
 
     # Top matches anything
@@ -122,6 +132,8 @@ def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Union[bool, dict]
         key = a.metadata["tvar"]
         if key in subst:
             return unify(subst[key], b, subst)
+        if occurs(key, b, subst):
+            return False 
         subst[key] = b
         return subst
 
@@ -129,6 +141,8 @@ def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Union[bool, dict]
         key = b.metadata["tvar"]
         if key in subst:
             return unify(a, subst[key], subst)
+        if occurs(key, a, subst):
+            return False
         subst[key] = a
         return subst
 
@@ -142,16 +156,3 @@ def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Union[bool, dict]
         if subst is False:
             return False
     return subst
-
-
-def lift_to_list(t_: Type) -> Type:
-    """Lift a type to a list type if not already"""
-    if t_.name == "List":
-        return t_
-    return List(t_)
-
-def type_complexity(t_: Type) -> int:
-    """Calculate the complexity/depth of a type"""
-    if not t_.params:
-        return 1
-    return 1 + max(type_complexity(p) for p in t_.params)
