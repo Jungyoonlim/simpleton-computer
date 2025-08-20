@@ -25,3 +25,4 @@ So Σ view: explore all possible actions or data-context pairs at once.
 Π-panel: see which global constraints are being enforced.
 A pullback lens: shift perspective. Reindex the same data by a different context. 
 
+# Type System Core 

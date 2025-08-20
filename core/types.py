@@ -6,6 +6,9 @@ import typing as t
 
 @dataclass(frozen=True)
 class Type:
+    """
+    the Type dataclass
+    """
     name: str
     params: t.List['Type'] = field(default_factory=list)     
     metadata: t.Dict[str, t.Any] = field(default_factory=dict) 
