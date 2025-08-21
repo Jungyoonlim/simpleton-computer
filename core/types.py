@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import typing as t  
 
-
 @dataclass(frozen=True)
 class Type:
     """
@@ -43,6 +42,10 @@ String = Type("String")
 Float = Type("Float")
 Bytes = Type("Bytes")
 Top = Type("Top")   # <-- rename from Any to avoid collision
+Doc = Type("Doc")
+Comment = Type("Comment")
+Date = Type("Date")
+Path = Type("Path")
 
 # Container Types
 def List(t_: Type) -> Type:
@@ -117,7 +120,6 @@ def occurs(var: str, t: Type, subst: dict) -> bool:
 
 # Unification
 def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Union[bool, dict]:
-    """"""
     subst = {} if subst is None else dict(subst)
 
     # Top matches anything

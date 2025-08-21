@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing as t 
 from dataclasses import dataclass, field 
 
-from core.types import Type, Doc, List, Comment, Unit
+from core.types import Type, Doc, List, Comment, Unit, Option
 from fileio.files import parse_comments, CommentValue
 
 @dataclass
@@ -83,3 +83,8 @@ def delete_all(comments: t.List[CommentValue]) -> None:
     src = comments[0].source_path if comments else "—"
     print(f"[delete_all] Would delete {len(comments)} comments from {src}")
     return None
+
+@register_action("head_comment", List(Comment), Option(Comment))
+def head_comment(comments: t.List[CommentValue]) -> t.Optional[CommentValue]:
+    """List[Comment] -> Option[Comment]; returns first comment or None"""
+    return comments[0] if comments else None
