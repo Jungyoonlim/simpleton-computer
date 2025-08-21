@@ -44,6 +44,8 @@ Bytes = Type("Bytes")
 Top = Type("Top")   # <-- rename from Any to avoid collision
 Doc = Type("Doc")
 Comment = Type("Comment")
+Task = Type("Task")
+Link = Type("Link")
 Date = Type("Date")
 Path = Type("Path")
 

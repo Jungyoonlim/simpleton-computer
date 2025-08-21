@@ -1,0 +1,7 @@
+comment [joanne|2025-08-10] Fix this paragraph
+comment [alice|2025-08-15] Consider shortening intro
+task    [task-101|open   ] Write type system spec
+task    [task-102|done   ] Refactor action registry
+task    [task-103|open   ] Add effect handling
+task    [task-104|blocked] Waiting on LLM API keys
+link    [https://example.com/about] "About Us"

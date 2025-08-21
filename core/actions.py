@@ -3,8 +3,8 @@ from __future__ import annotations
 import typing as t 
 from dataclasses import dataclass, field 
 
-from core.types import Type, Doc, List, Comment, Unit, Option
-from fileio.files import parse_comments, CommentValue
+from core.types import Type, Doc, List, Comment, Task, Unit, Option
+from fileio.files import parse_comments, CommentValue, TaskValue, load_mixed
 
 @dataclass
 class Action: 
@@ -88,3 +88,9 @@ def delete_all(comments: t.List[CommentValue]) -> None:
 def head_comment(comments: t.List[CommentValue]) -> t.Optional[CommentValue]:
     """List[Comment] -> Option[Comment]; returns first comment or None"""
     return comments[0] if comments else None
+
+@register_action("extract_tasks", Doc, List(Task), effect="pure")
+def extract_tasks(doc) -> t.List[TaskValue]:
+    """Doc -> List[Task]; extract tasks from mixed file"""
+    vals = load_mixed(doc.path)
+    return [v for v in vals if isinstance(v, TaskValue)]

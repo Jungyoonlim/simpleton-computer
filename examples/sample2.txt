@@ -1,4 +1,0 @@
-[task-101|open   ] Write type system spec
-[task-102|done   ] Refactor action registry
-[task-103|open   ] Add effect handling
-[task-104|blocked] Waiting on LLM API keys

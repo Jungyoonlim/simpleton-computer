@@ -1,17 +1,19 @@
 from dataclasses import dataclass
-from core.types import Doc
 from typing import List as PyList, Union, Optional
 import re
 
-class DocValue: 
-    def __init__(self, path: str, text: str):
-        self.path = path
-        self.text = text 
-    
+# --- Doc container ---
+@dataclass(frozen=True)
+class DocValue:
+    path: str
+    text: str
+
 def load_doc(path: str):
-    with open(path, "r", encoding="utf-8") as f: 
+    from core.types import Doc  # avoid circulars
+    with open(path, "r", encoding="utf-8") as f:
         return Doc, DocValue(path, f.read())
-    
+
+# --- Domain values ---
 @dataclass(frozen=True)
 class CommentValue:
     author: str
@@ -38,10 +40,9 @@ class LinkValue:
 
 DocAny = Union[CommentValue, TaskValue, LinkValue]
 
-# Line regexes 
-TAG_RE   = re.compile(r"^\s*(?P<tag>\w+)\s+(?P<body>.+)$")
-
-_COMMENT_RE = re.compile(r"^\s*\[(?P<author>[^|\]]+)\|(?P<date>\d{4}-\d{2}-\d{2})\]\s*(?P<text>.+)$")
+# --- Regexes ---
+TAG_RE     = re.compile(r"^\s*(?P<tag>\w+)\s+(?P<body>.+)$")
+COMMENT_RE = re.compile(r"^\s*\[(?P<author>[^|\]]+)\|(?P<date>\d{4}-\d{2}-\d{2})\]\s*(?P<text>.+)$")
 
 TASK_RE = re.compile(
     r"^\s*\[(?P<id>[^\]|]+)\|(?P<status>[^\]]+)\]\s*(?P<text>.+)$"
@@ -53,7 +54,7 @@ LINK_RE = re.compile(
 def parse_comments(doc: DocValue) -> PyList[CommentValue]:
     out: PyList[CommentValue] = []
     for line in doc.text.splitlines():
-        m = _COMMENT_RE.match(line)
+        m = COMMENT_RE.match(line)
         if m:
             out.append(CommentValue(
                 author=m.group("author").strip(),
@@ -65,7 +66,7 @@ def parse_comments(doc: DocValue) -> PyList[CommentValue]:
 
 # ----- Parsers per tag -----
 def parse_comment(body: str, path: str) -> Optional[CommentValue]:
-    m = _COMMENT_RE.match(body)
+    m = COMMENT_RE.match(body)
     if not m: return None
     return CommentValue(
         author=m.group("author").strip(),
