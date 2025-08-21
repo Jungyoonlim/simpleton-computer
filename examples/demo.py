@@ -4,7 +4,7 @@ from core.engine import execute
 from core.plan import plan_and_run
 
 # Load document
-doc_t, doc_v = load_doc("examples/sample.txt")
+doc_t, doc_v = load_doc("examples/sample2.txt")
 
 # 1. Direct single action
 out_t, out_v = execute("extract_comments", doc_v)
