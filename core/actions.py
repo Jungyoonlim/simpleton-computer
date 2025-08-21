@@ -1,10 +1,28 @@
+from __future__ import annotations
+
 import typing as t 
+from dataclasses import dataclass, field 
+
 from core.types import Type, Doc, List, Comment, Unit
 from fileio.files import parse_comments, CommentValue
+
+@dataclass
+class Action: 
+    name: str 
+    input_t: Type
+    output_t: Type 
+    fn: t.Callable[[t.Any], t.Any]
+    meta: dict = field(default_factory=dict)
 
 _registry: t.Dict[str, t.Tuple[Type, Type, t.Callable]] = {}
 
 def register_action(name: str, input_t: Type, output_t: Type):
+    """
+    Decorator: Register a typed action 
+    Usage: 
+        @register_action("foo", InType, OutType, effect="IO")
+        def foo(v):
+    """
     def deco(fn: t.Callable):
         _registry[name] = (input_t, output_t, fn)
         return fn 
@@ -17,6 +35,9 @@ def list_actions_for(t_: Type):
 def run(name: str, value):
     inp_t, out_t, fn = _registry[name]
     return out_t, fn(value)
+
+
+# ------- Your actions -------
 
 @register_action("extract_comments", Doc, List(Comment))
 def extract_comments(doc):
