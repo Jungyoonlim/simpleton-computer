@@ -11,22 +11,22 @@ The main demonstration script that shows all major features:
 - Loading mixed content (comments, tasks, links)
 - Using the plan and execution engine
 
-Run with: `python -m examples.demo`
+Run with: `python3 -m examples.demo`
 
 ### `comments_demo.py` - Comment Extraction
 Focused demonstration of comment extraction functionality.
 
-Run with: `python -m examples.comments_demo`
+Run with: `python3 -m examples.comments_demo`
 
 ### `tasks_demo.py` - Task Extraction
 Focused demonstration of task extraction functionality.
 
-Run with: `python -m examples.tasks_demo`
+Run with: `python3 -m examples.tasks_demo`
 
 ### `mixed_demo.py` - Mixed Content Loading
 Simple demonstration of loading and displaying mixed content types.
 
-Run with: `python -m examples.mixed_demo`
+Run with: `python3 -m examples.mixed_demo`
 
 ## Sample Data Files
 
@@ -35,7 +35,7 @@ Run with: `python -m examples.mixed_demo`
 
 ## Expected Output for Main Demo
 
-When running `python -m examples.demo`, you should see:
+When running `python3 -m examples.demo`, you should see:
 
 1. **Extracted comments** - List of comment objects parsed from the document
 2. **Extracted tasks** - List of task objects parsed from the document
