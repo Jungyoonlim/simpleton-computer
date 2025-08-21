@@ -25,4 +25,18 @@ So Σ view: explore all possible actions or data-context pairs at once.
 Π-panel: see which global constraints are being enforced.
 A pullback lens: shift perspective. Reindex the same data by a different context. 
 
-# Type System Core 
+## Why Type Theory?
+- Can enforce a type discipline on every action, every resource, and every effect.
+- Lets you: 
+    - Filter out nonsense plans before they even run.
+    - Offer provable guarantees 
+    - Interop multiple LLMs 
+- Adaptive UI as a first-class effect
+    - Instead of AI bolted on top of an OS, the system is the compositor 
+
+- Resource + Capability security model 
+    - Most AI agents are unsafe. 
+    - Baking in a linear/affine resource discipline and explicit permit tokens. 
+- Planner + Heuristics tuned for human-scaled OS
+    - Move towards A with type distance heuristics + caching + learned preferences (from brute force BFS or ReAct)
+    - Cheap enough to run on device 
