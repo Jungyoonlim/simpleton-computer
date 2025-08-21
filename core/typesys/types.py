@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import typing as t  
+from .kinds import K_TYPE
 
 @dataclass(frozen=True)
 class Type:
@@ -11,6 +12,7 @@ class Type:
     name: str
     params: t.List['Type'] = field(default_factory=list)     
     metadata: t.Dict[str, t.Any] = field(default_factory=dict) 
+    kind: str = K_TYPE
 
     @property
     def carrier(self):
@@ -67,7 +69,6 @@ def Map(key_t: Type, value_t: Type) -> Type:   # <-- rename from Dict to avoid s
 
 def Set(t_: Type) -> Type:
     return Type("Set", [t_])
-
 
 def Range(start_t: Type | None = None, end_t: Type | None = None) -> Type:
     start_t = start_t or Int
