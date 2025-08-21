@@ -68,7 +68,7 @@ def filter_author_me(comments: t.List[CommentValue]) -> t.List[CommentValue]:
     return [c for c in comments if c.author.strip().lower() in me_aliases]
 
 @register_action("filter_last_10_days", List(Comment), List(Comment))
-def filter_last_10_days(comments: t.List[CommentValue]):
+def filter_last_10_days(comments: t.List[CommentValue]) -> t.List[CommentValue]:
     """List[Comment] -> List[Comment]; keeps comments with date within last 10 days (naive ISO compare)"""
     # quick-and-dirty: compare strings; good enough if month boundaries are sane
     import datetime as dt
@@ -76,9 +76,10 @@ def filter_last_10_days(comments: t.List[CommentValue]):
     return [c for c in comments if c.date >= cutoff]
 
 @register_action("delete_all", List(Comment), Unit)
-def delete_all(comments: t.List[CommentValue]):
+def delete_all(comments: t.List[CommentValue]) -> None:
     """List[Comment] -> Unit; simulate deletion (side-effect)"""
     # In a real editor, you'd rewrite the file without these comment lines.
     # For now, just print what would be deleted.
-    print(f"[delete_all] Would delete {len(comments)} comments from {comments[0].source_path if comments else '—'}")
+    src = comments[0].source_path if comments else "—"
+    print(f"[delete_all] Would delete {len(comments)} comments from {src}")
     return None
