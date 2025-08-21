@@ -9,7 +9,7 @@ class DocValue:
     text: str
 
 def load_doc(path: str):
-    from core.types import Doc  # avoid circulars
+    from core.typesys.types import Doc  # avoid circulars
     with open(path, "r", encoding="utf-8") as f:
         return Doc, DocValue(path, f.read())
 

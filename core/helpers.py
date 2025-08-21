@@ -1,6 +1,6 @@
 import typing as t 
 
-from .types import Type, List
+from .typesys.types import Type, List
 
 def is_container_type(t_: Type) -> bool:
     """Check if a type is a container type"""

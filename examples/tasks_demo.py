@@ -1,6 +1,6 @@
 from fileio.files import load_doc
 from core.plan import plan_and_run
-from core.types import List, Task
+from core.typesys.types import List, Task
 
 doc_t, doc_v = load_doc("examples/sample_mixed_content.txt")
 goal_t = List(Task)

@@ -1,4 +1,4 @@
-from core.types import TVar, List, Function, Int, Bool, unify
+from core.typesys.types import TVar, List, Function, Int, Bool, unify
 
 A = TVar("A")
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing as t 
 from dataclasses import dataclass, field 
 
-from core.types import Type, Doc, List, Comment, Task, Unit, Option
+from core.typesys.types import Type, Doc, List, Comment, Task, Unit, Option
 from fileio.files import parse_comments, CommentValue, TaskValue, load_mixed
 
 @dataclass
@@ -34,7 +34,7 @@ def list_actions_for(t_: Type) -> dict[str, Action]:
     """
     Return actions whose input type unifies with t_. 
     """
-    from core.types import unify
+    from core.typesys.types import unify
     out: dict[str, Action] = {}
     for name, act in _REGISTRY.items():
         ok = unify(act.input_t, t_)
