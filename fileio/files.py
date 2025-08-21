@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from core.types import Doc
 from typing import List as PyList, Tuple
-import re, time, os 
+import re
 
 class DocValue: 
     def __init__(self, path: str, text: str):

@@ -14,38 +14,55 @@ class Action:
     fn: t.Callable[[t.Any], t.Any]
     meta: dict = field(default_factory=dict)
 
-_registry: t.Dict[str, t.Tuple[Type, Type, t.Callable]] = {}
+_REGISTRY: dict[str, Action] = {}
 
-def register_action(name: str, input_t: Type, output_t: Type):
+def register_action(name: str, input_t: Type, output_t: Type, **meta):
     """
     Decorator: Register a typed action 
     Usage: 
         @register_action("foo", InType, OutType, effect="IO")
         def foo(v):
     """
-    def deco(fn: t.Callable):
-        _registry[name] = (input_t, output_t, fn)
+    def deco(fn: t.Callable[[t.Any], t.Any]):
+        if name in _REGISTRY: 
+            raise ValueError(f"Action '{name}' already registered")
+        _REGISTRY[name] = Action(name, input_t, output_t, fn, meta)
         return fn 
     return deco
 
-def list_actions_for(t_: Type):
+def list_actions_for(t_: Type) -> dict[str, Action]:
+    """
+    Return actions whose input type unifies with t_. 
+    """
     from core.types import unify
-    return {name: (inp, out) for name, (inp, out, _) in _registry.items() if unify(inp, t_)}
+    out: dict[str, Action] = {}
+    for name, act in _REGISTRY.items():
+        ok = unify(act.input_t, t_)
+        if ok is not False:
+            out[name] = act
+    return out 
 
 def run(name: str, value):
-    inp_t, out_t, fn = _registry[name]
-    return out_t, fn(value)
+    """
+    Execute a registered action by name 
+    Returns (output_type, output_value)
+    """
+    act = _REGISTRY.get(name)
+    if not act:
+        raise KeyError(f"Unknown action '{name}'. Registered: {', '.join(sorted(_REGISTRY)) or '(none)'}")
+    result = act.fn(value)
+    return act.output_t, result
 
 
 # ------- Your actions -------
 
-@register_action("extract_comments", Doc, List(Comment))
-def extract_comments(doc):
+@register_action("extract_comments", Doc, List(Comment), effect="pure")
+def extract_comments(doc) -> t.List[CommentValue]:
     """Doc -> List[Comment]"""
     return parse_comments(doc)
 
 @register_action("filter_author_me", List(Comment), List(Comment))
-def filter_author_me(comments: t.List[CommentValue]):
+def filter_author_me(comments: t.List[CommentValue]) -> t.List[CommentValue]:
     """List[Comment] -> List[Comment]; demo filter"""
     me_aliases = {"me", "joanne", "jungyoon", "jungyoon lim"}
     return [c for c in comments if c.author.strip().lower() in me_aliases]
