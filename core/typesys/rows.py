@@ -51,6 +51,10 @@ class CollectedRow:
     labels: dict[str, Type]
     tail: Type | None 
     ok: bool 
+    
+    def is_closed(self) -> bool:
+        """True if this is a closed row (tail is RowEmpty or None)"""
+        return self.tail is None or (hasattr(self.tail, 'name') and self.tail.name == "RowEmpty") 
 
 def collect_row(r: Type, return_tail: bool = False) -> CollectedRow: 
     """

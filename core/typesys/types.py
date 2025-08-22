@@ -70,6 +70,14 @@ def Map(key_t: Type, value_t: Type) -> Type:   # <-- rename from Dict to avoid s
 def Set(t_: Type) -> Type:
     return Type("Set", [t_])
 
+def Record(row: Type) -> Type:
+    """Record type built from a row: Record(RowExt(...))"""
+    return Type("Record", [row])
+
+def Variant(row: Type) -> Type:
+    """Variant type built from a row: Variant(RowExt(...))"""
+    return Type("Variant", [row])
+
 def Range(start_t: Type | None = None, end_t: Type | None = None) -> Type:
     start_t = start_t or Int
     end_t = end_t or Int
