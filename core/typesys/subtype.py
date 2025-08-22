@@ -5,7 +5,27 @@ from .kinds import K_EFFROW
 
 def EffEmpty() -> Type: 
     """
-    
+    Closed empty effect row 
     """
     return Type("EffEmpty", kind=K_EFFROW)
 
+def EffExt(effect: str, tail: Type) -> Type: 
+    """
+    
+    """
+    assert getattr(tail, "kind", None) == K_EFFROW, f""
+
+def _flatten_effect_row(): 
+    return 
+
+def _effect_row_subtype() -> bool: 
+    return 
+
+def _nominal_leq():
+    return 
+
+def is_subtype():
+    return 
+
+def type_equiv():
+    return 
