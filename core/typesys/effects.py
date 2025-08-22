@@ -20,10 +20,19 @@ def EffExt(effect: str, tail: Type) -> Type:
     assert tail.kind == K_EFFROW, f"Expected EffRow kind, got {tail.kind}"
     return Type("EffExt", [tail], metadata={"effect": effect}, kind=K_EFFROW)
 
+def _mk_row_from_labels(labels: set[str], tail: Type | None) -> Type:
+    row = EffEmpty() if tail is None else tail 
+    for lab in sorted(labels):
+        row = EffExt(lab, row)
+    return row 
+
 def collect_effects(eff_row: Type) -> set[str] | None:
     """
-    Flatten an effect row into a set of effect labels.
+    Flatten an effect row into a set of effect labels. (labels, tail, ok)
     Returns None if malformed.
+
+
+
     """
     if eff_row.kind != K_EFFROW:
         return None
@@ -55,6 +64,11 @@ def effect_union(eff1: Type, eff2: Type) -> Type:
     """
     Union of two closed effect rows.
     Returns EffEmpty for empty union.
+
+    - Closed ∪ Closed => Closed with union of labels
+    - Open(ρ) ∪ Closed => Open(ρ) with union of labels 
+    - Open(ρ) ∪ Open(ρ) => Open(ρ) with union of labels
+    - Open(ρ) ∪ Open(σ≠ρ) => returns a conservative unknown row variable `EffVar` 
     """
     effects1 = collect_effects(eff1)
     effects2 = collect_effects(eff2)
@@ -71,3 +85,8 @@ def effect_union(eff1: Type, eff2: Type) -> Type:
         result = EffExt(effect, result)
     
     return result 
+
+def effect_eq(a: Type, b: Type) -> bool:
+    """
+    
+    """
