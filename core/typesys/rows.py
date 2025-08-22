@@ -22,3 +22,39 @@ def _assert_row_kind(t: Type) -> None:
 def RowEmpty() -> Type: 
     return Type("RowEmpty", kind=K_ROW)
 
+def RowExt(label: str, ty: Type, tail: Type) -> Type: 
+    _assert_row_kind(tail)
+    return Type("RowExt", [ty, tail], metadata={"label": label}, kind=K_ROW)
+
+def Rec(**fields: Type) -> Type: 
+    """
+    Build a record type {field1: T1, field2: T2, ...}
+    Under the hood: Record(RowExt(...))
+    """
+    row = RowEmpty()
+    for lbl, ty in reversed(list(fields.items())):
+        row = RowExt(lbl, ty, row)
+    return Record(row)
+
+def Case(labels: dict[str, Type]) -> Type: 
+    """
+    Build a variant type <Lbl1: T1 | Lbl2: T2 | ...>
+    Under the hood: Variant(RowExt(...))
+    """
+    row = RowEmpty()
+    for lbl, ty in reversed(list(labels.items())):
+        row = RowExt(lbl, ty, row)
+    return Variant(row)
+
+@dataclass(frozen=True)
+class CollectedRow: 
+    labels: dict[str, Type]
+    tail: Type | None 
+    ok: bool 
+
+def collect_row(r: Type, return_tail: bool = False) -> CollectedRow: 
+    """
+    Flatten a row chain into a dictionary of labels and optionally its tail. 
+
+    
+    """
