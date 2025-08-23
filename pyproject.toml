@@ -1,7 +1,7 @@
 [project]
 name = "simpleton-computer"
 version = "0.1.0"
-description = "Add your description here"
+description = "A type-directed computing environment"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -9,6 +9,9 @@ dependencies = [
     "networkx>=3.5",
     "pydantic>=2.11.7",
     "rich>=13.0.0",
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+    "python-multipart>=0.0.6",
 ]
 
 [dependency-groups]
@@ -17,3 +20,10 @@ dev = [
     "pytest>=8.4.1",
     "ruff>=0.12.9",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["core", "fileio", "hal", "backend"]
