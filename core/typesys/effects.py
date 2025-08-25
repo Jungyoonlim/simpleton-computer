@@ -87,6 +87,17 @@ def effect_union(eff1: Type, eff2: Type) -> Type:
     return result 
 
 def effect_eq(a: Type, b: Type) -> bool:
-    """
+    """Check if two effect rows are equivalent."""
+    effects_a = collect_effects(a)
+    effects_b = collect_effects(b)
     
-    """
+    # If both are closed, compare their effect sets
+    if effects_a is not None and effects_b is not None:
+        return effects_a == effects_b
+    
+    # If both are open/unknown, check structural equality
+    if effects_a is None and effects_b is None:
+        return a == b
+    
+    # One closed, one open - not equal
+    return False
