@@ -3,12 +3,56 @@ Effect rows are just rows of effect labels.
 
 Computational effects a function may perform e.g. {Console, Network}
 represented as EffExt("Console", EffExt("Network", EffEmpty()))
+
+Mathematical Model 
+------------------
+An effect row ε is a finite set of labels with an optinal tail (row variable)
+
+    ε ::= {ℓ1, …, ℓn} (closed)
+    | {ℓ1, …, ℓn | ρ} (open tail ρ)
+
+- Closed rows behave like finite sets of labels.
+- Open rows are those same sets + an unknown remainder ρ.
+
+Representation in this module
+-----------------------------
+We encode rows as a right-linked list using two constructors: 
+
+    EffEmpty ≡ {}
+    EffExt(label, tail) ≡ {label} ∪ tail
+
+and reuse TVar(kind=K_EFFROW) for an open tail (ρ). We also use a conservative
+unknown placeholder `Type("EffVar", kind=K_EFFROW)` when an operation would
+require a union of *distinct* row variables (ρ ⊔ σ) that we do not explicitly
+model.
+
+Algebra (informal laws)
+-----------------------
+- Normalization: Order and duplicates are irrelevant; we canonicalize by sorting labels and deduping. 
+- Union: 
+    {A,B} ∪ {B,C} = {A,B,C}
+    {A | ρ} ∪ {B} = {A,B | ρ}
+    {A | ρ} ∪ {B | ρ} = {A,B | ρ}
+    {A | ρ} ∪ {B | σ≠ρ} → EffVar (conservative unknown)
+• Intersection and difference follow the same spirit; if tails disagree we
+return EffVar.
+• Equality: two rows are equal iff their label-sets and tails match. Closed vs
+open are never equal. Unknown (EffVar) is unequal to everything.
+    
+Intuition 
+---------
+Effect rows act as capabilities. `{Network, Files}` means a computation
+may use network and filesystem. Open tails let library code be polymorphic in the 
+extra capabilities it inherits from its arguments. 
 """
 
 from __future__ import annotations
+from typing import Iterable, Optional, Tuple, Set 
+
 from .kinds import K_EFFROW
 from .types import Type, TVar, is_tvar
 
+# Constructors 
 def EffEmpty() -> Type: 
     return Type("EffEmpty", kind=K_EFFROW)
 
@@ -20,19 +64,37 @@ def EffExt(effect: str, tail: Type) -> Type:
     assert tail.kind == K_EFFROW, f"Expected EffRow kind, got {tail.kind}"
     return Type("EffExt", [tail], metadata={"effect": effect}, kind=K_EFFROW)
 
+def EffRowVar(name: str = "ρ") -> Type: 
+    return TVar(name, kind=K_EFFROW)
+
+# Internal Helpers 
 def _mk_row_from_labels(labels: set[str], tail: Type | None) -> Type:
     row = EffEmpty() if tail is None else tail 
     for lab in sorted(labels):
         row = EffExt(lab, row)
     return row 
 
+def _split_labels_tail(eff_row: Type) -> Optional[Tuple[Set[str], Optional[Type]]]:
+    """
+    Traverse an effect row and return (labels, tail)
+    - If closed, tail is None 
+    - If open, tail is a TVar(kind=K_EFFROW)
+    """
+    labels = set()
+    current = eff_row 
+
+    if current.name == "EffEmpty":
+        return (labels, None)
+    elif is_tvar(current):
+        return (labels, current)
+    else: 
+        return None 
+
+# Basic queries 
 def collect_effects(eff_row: Type) -> set[str] | None:
     """
     Flatten an effect row into a set of effect labels. (labels, tail, ok)
     Returns None if malformed.
-
-
-
     """
     if eff_row.kind != K_EFFROW:
         return None
@@ -101,3 +163,13 @@ def effect_eq(a: Type, b: Type) -> bool:
     
     # One closed, one open - not equal
     return False
+
+def normalize_row(eff_row: Type) -> Type: 
+    """
+    Normalize to canonical form: sorted, deduplicated labels    
+    """
+    result = _split_labels_tail(eff_row)
+    if result is None: 
+        return eff_row
+    labels, tail = result 
+    return _mk_row_from_labels(labels, tail)
