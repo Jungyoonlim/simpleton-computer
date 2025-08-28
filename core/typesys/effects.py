@@ -80,8 +80,16 @@ def _split_labels_tail(eff_row: Type) -> Optional[Tuple[Set[str], Optional[Type]
     - If closed, tail is None 
     - If open, tail is a TVar(kind=K_EFFROW)
     """
+    if eff_row.kind != K_EFFROW: 
+        return None 
+
     labels = set()
     current = eff_row 
+
+    # Traverse the list 
+    while current.name == "EffExt":
+        labels.add(current.metadata["effect"])
+        current = current.params[0]
 
     if current.name == "EffEmpty":
         return (labels, None)
