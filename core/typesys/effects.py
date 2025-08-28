@@ -157,7 +157,16 @@ def effect_union(eff1: Type, eff2: Type) -> Type:
     elif tail1 is None:
         # First closed, second open 
         tail = tail2 
-        
+    elif tail2 is None:
+        # First open, second closed 
+        tail = tail1 
+    elif tail1 == tail2: 
+        # Same tail variable 
+        tail = tail1 
+    else: 
+        return Type("EffVar", kind=K_EFFROW)
+
+    return _mk_row_from_labels(all_labels, tail)
 
 def effect_eq(a: Type, b: Type) -> bool:
     """Check if two effect rows are equivalent."""
