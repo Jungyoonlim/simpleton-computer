@@ -93,7 +93,7 @@ def _split_labels_tail(eff_row: Type) -> Optional[Tuple[Set[str], Optional[Type]
 
     if current.name == "EffEmpty":
         return (labels, None)
-    elif is_tvar(current):
+    elif is_tvar(current) or current.name == "EffVar":
         return (labels, current)
     else: 
         return None 
@@ -140,21 +140,24 @@ def effect_union(eff1: Type, eff2: Type) -> Type:
     - Open(ρ) ∪ Open(ρ) => Open(ρ) with union of labels
     - Open(ρ) ∪ Open(σ≠ρ) => returns a conservative unknown row variable `EffVar` 
     """
-    effects1 = collect_effects(eff1)
-    effects2 = collect_effects(eff2)
+    r1 = _split_labels_tail(eff1)
+    r2 = _split_labels_tail(eff2)
+
+    if r1 is None or r2 is None:
+        return Type("EffVar", kind=K_EFFROW)
     
-    if effects1 is None or effects2 is None:
-        # Can't union open effect rows
-        return Type("EffVar", kind=K_EFFROW)  # Return unknown effect variable
+    labels1, tail1 = r1 
+    labels2, tail2 = r2 
     
-    all_effects = effects1 | effects2
-    
-    # Build effect row from sorted effects for deterministic ordering
-    result = EffEmpty()
-    for effect in sorted(all_effects):
-        result = EffExt(effect, result)
-    
-    return result 
+    all_labels = labels1 | labels2 
+
+    if tail1 is None and tail2 is None:
+        # Both closed 
+        tail = None 
+    elif tail1 is None:
+        # First closed, second open 
+        tail = tail2 
+        
 
 def effect_eq(a: Type, b: Type) -> bool:
     """Check if two effect rows are equivalent."""
