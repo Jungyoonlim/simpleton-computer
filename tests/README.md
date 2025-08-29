@@ -72,7 +72,7 @@ tests/
 - ✅ EffEmpty construction
 - ✅ EffExt construction and chaining
 - ✅ collect_effects functionality
-- ✅ has_effect checking
+- ✅ has_effect checking 
 - ✅ Effect row helper functions
 - ✅ Integration with type system
 

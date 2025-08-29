@@ -8,6 +8,12 @@ from .kinds import K_TYPE
 class Type:
     """
     the Type dataclass
+
+    Algebraic Type Term:
+    - Name: Head Symbol in Σ 
+    - Params: Subterms (τ1,...,τk)
+    - Metadata: Extra Annotations 
+    - Kind: Implementation Tag 
     """
     name: str
     params: t.List['Type'] = field(default_factory=list)     
