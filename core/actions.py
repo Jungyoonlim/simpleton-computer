@@ -59,7 +59,11 @@ def run(name: str, value):
 @register_action("extract_comments", Doc, List(Comment), effect="pure")
 def extract_comments(doc) -> t.List[CommentValue]:
     """Doc -> List[Comment]"""
-    return parse_comments(doc)
+    path = getattr(doc, "path", doc)
+    try: 
+        return parse_comments(path)
+    except TypeError:
+        return parse_comments(doc)
 
 @register_action("filter_author_me", List(Comment), List(Comment))
 def filter_author_me(comments: t.List[CommentValue]) -> t.List[CommentValue]:
@@ -72,8 +76,18 @@ def filter_last_10_days(comments: t.List[CommentValue]) -> t.List[CommentValue]:
     """List[Comment] -> List[Comment]; keeps comments with date within last 10 days (naive ISO compare)"""
     # quick-and-dirty: compare strings; good enough if month boundaries are sane
     import datetime as dt
-    cutoff = (dt.date.today() - dt.timedelta(days=10)).isoformat()
-    return [c for c in comments if c.date >= cutoff]
+    cutoff = (dt.date.today() - dt.timedelta(days=10))
+    out: list[CommentValue] = []
+
+    for c in comments: 
+        s = str(getattr(c, "date", ""))[:10]
+        try: 
+            d = dt.date.fromisoformat(s)
+        except Exception:
+            continue 
+        if d >= cutoff: 
+            out.append(c)
+    return out 
 
 @register_action("delete_all", List(Comment), Unit)
 def delete_all(comments: t.List[CommentValue]) -> None:
@@ -92,5 +106,6 @@ def head_comment(comments: t.List[CommentValue]) -> t.Optional[CommentValue]:
 @register_action("extract_tasks", Doc, List(Task), effect="pure")
 def extract_tasks(doc) -> t.List[TaskValue]:
     """Doc -> List[Task]; extract tasks from mixed file"""
-    vals = load_mixed(doc.path)
+    path = getattr(doc, "path", doc)
+    vals = load_mixed(path)
     return [v for v in vals if isinstance(v, TaskValue)]
