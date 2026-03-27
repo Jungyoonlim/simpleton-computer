@@ -1,5 +1,4 @@
 from __future__ import annotations 
-import typing as t 
 from .types import Type
 from .kinds import K_EFFROW
 
@@ -13,7 +12,7 @@ def EffExt(effect: str, tail: Type) -> Type:
     """
     
     """
-    assert getattr(tail, "kind", None) == K_EFFROW, f""
+    assert getattr(tail, "kind", None) == K_EFFROW, ""
 
 def _flatten_effect_row(): 
     return 

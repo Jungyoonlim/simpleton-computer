@@ -4,7 +4,7 @@ Tests for basic effect row construction and operations.
 Tests EffEmpty, EffExt, collect_effects, has_effect, and basic effect row functionality.
 """
 import pytest
-from core.typesys.types import Type, TVar
+from core.typesys.types import Type
 from core.typesys.effects import (
     EffEmpty, EffExt, collect_effects, has_effect, _mk_row_from_labels
 )
@@ -291,7 +291,7 @@ class TestEffectRowIntegration:
     
     def test_effect_row_as_type_parameter(self):
         """Test using effect rows as type parameters."""
-        from core.typesys.types import Function, Int, String
+        from core.typesys.types import Int, String
         
         empty = EffEmpty()
         io_eff = EffExt("IO", empty)

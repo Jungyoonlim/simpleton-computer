@@ -5,17 +5,14 @@ This module provides the core runtime infrastructure for executing actions with
 proper resource management, capability enforcement, and effect tracking.
 """
 
-import asyncio
 import resource
 import time
 import threading
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, Callable, TypeVar, Generic
+from typing import Dict, List, Optional, Set, Callable
 from contextlib import contextmanager
 from enum import Enum
 
-from .typesys.types import Type
-from .typesys.effects import Type as EffectType
 
 
 class ExecutionState(Enum):
@@ -130,7 +127,7 @@ class ExecutionContext:
             self._check_resource_limits()
             self.state = ExecutionState.COMPLETED
             
-        except Exception as e:
+        except Exception:
             self.state = ExecutionState.FAILED
             raise
             

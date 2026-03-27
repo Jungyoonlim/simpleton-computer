@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import os
 import uuid
 import typing as t
 from pathlib import Path
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -12,9 +11,9 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from core.typesys.types import Type, Doc, List, Comment, Task, Link, Unit, Option
-from core.actions import list_actions_for, run as run_action, _REGISTRY, Action
+from core.actions import list_actions_for, _REGISTRY
 from core.plan import find_chain, list_actions_for as plan_toolspace
-from fileio.files import load_doc, DocValue, CommentValue, TaskValue, LinkValue
+from fileio.files import DocValue, CommentValue, TaskValue, LinkValue
 
 import core.actions  # noqa: F401 – triggers @register_action decorators
 
@@ -28,8 +27,8 @@ if "summarize" not in core.actions._REGISTRY:
 if "extract_titles" not in core.actions._REGISTRY:
     @register_action("extract_titles", Doc, List(Doc))
     def extract_titles(doc):
-        lines = [l.strip() for l in doc.text.splitlines() if l.strip().startswith("#")]
-        return [type("X", (object,), {"path": doc.path, "text": l})() for l in lines]
+        lines = [line.strip() for line in doc.text.splitlines() if line.strip().startswith("#")]
+        return [type("X", (object,), {"path": doc.path, "text": line})() for line in lines]
 
 STATIC_DIR = Path(__file__).parent / "static"
 

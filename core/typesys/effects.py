@@ -47,7 +47,7 @@ extra capabilities it inherits from its arguments.
 """
 
 from __future__ import annotations
-from typing import Iterable, Optional, Tuple, Set 
+from typing import Optional, Tuple, Set 
 
 from .kinds import K_EFFROW
 from .types import Type, TVar, is_tvar

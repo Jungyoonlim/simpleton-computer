@@ -4,10 +4,9 @@ Tests for row collection and manipulation functions.
 Tests collect_row, get_label_type, row_subtract, row_union, and CollectedRow dataclass.
 """
 import pytest
-from core.typesys.types import Type, TVar, Int, String, Bool, Float
+from core.typesys.types import Type, Int, String, Bool, Float
 from core.typesys.rows import (
-    RowEmpty, RowExt, Rec, Case, 
-    collect_row, CollectedRow, get_label_type, row_subtract, row_union
+    RowEmpty, RowExt, Rec, collect_row, CollectedRow, get_label_type, row_subtract, row_union
 )
 from core.typesys.kinds import K_ROW
 
@@ -95,27 +94,11 @@ class TestCollectRowBasic:
         
     def test_collect_row_with_tvar_tail(self):
         """Test collecting row with type variable tail."""
-        # Create a TVar and manually set its kind (note: this is a hack due to frozen dataclass)
-        tv = TVar("r")
-        # We need to create a row TVar differently - let's create one that the system recognizes
-        # For now, let's skip this test since it requires modifying the frozen TVar
         pytest.skip("TVar kind modification not supported with frozen dataclass")
-        result = collect_row(row)
-        
-        assert result.labels == {"x": Int}
-        assert result.tail is None  # TVar tail not returned by default
-        assert result.ok is True
-        assert result.is_closed() is False
-        
+
     def test_collect_row_with_tvar_tail_returned(self):
         """Test collecting row with type variable tail returned."""
         pytest.skip("TVar kind modification not supported with frozen dataclass")
-        result = collect_row(row, return_tail=True)
-        
-        assert result.labels == {"x": Int}
-        assert result.tail == tv
-        assert result.ok is True
-        assert result.is_closed() is False
 
 
 class TestCollectRowErrorCases:
@@ -145,12 +128,8 @@ class TestCollectRowErrorCases:
         
     def test_collect_row_malformed_structure(self):
         """Test collecting malformed row structure."""
-        # Create a Type that claims to be RowExt but has wrong structure
-        # This is more of an integration test for robustness
-        malformed = Type("RowExt", [Int], kind=K_ROW)  # Missing label in metadata
-        
-        # This might cause issues depending on implementation
-        # The test ensures graceful handling of malformed structures
+        with pytest.raises(KeyError):
+            collect_row(Type("RowExt", [Int, RowEmpty()], kind=K_ROW))
 
 
 class TestGetLabelType:
@@ -180,9 +159,6 @@ class TestGetLabelType:
     def test_get_label_from_open_row(self):
         """Test getting label from open row with TVar tail."""
         pytest.skip("TVar kind modification not supported with frozen dataclass")
-        
-        assert get_label_type(row, "x") == Int
-        assert get_label_type(row, "y") is None  # Not in closed part
 
 
 class TestRowSubtract:
@@ -249,18 +225,6 @@ class TestRowSubtract:
     def test_subtract_open_rows_fails(self):
         """Test that subtracting open rows returns None."""
         pytest.skip("TVar kind modification not supported with frozen dataclass")
-        closed_row = RowExt("x", Int, empty)
-        
-        # Open row on left
-        assert row_subtract(open_row, closed_row) is None
-        
-        # Open row on right  
-        assert row_subtract(closed_row, open_row) is None
-        
-        # Open row on both sides
-        tv2 = Type("TVar(s)", params=[], metadata={"tvar": "s"}, kind=K_ROW)
-        open_row2 = RowExt("y", String, tv2)
-        assert row_subtract(open_row, open_row2) is None
 
 
 class TestRowUnion:
@@ -334,18 +298,6 @@ class TestRowUnion:
     def test_union_open_rows_fails(self):
         """Test that union of open rows returns None."""
         pytest.skip("TVar kind modification not supported with frozen dataclass")
-        closed_row = RowExt("y", String, empty)
-        
-        # Open row on left
-        assert row_union(open_row, closed_row) is None
-        
-        # Open row on right
-        assert row_union(closed_row, open_row) is None
-        
-        # Open row on both sides
-        tv2 = Type("TVar(s)", params=[], metadata={"tvar": "s"}, kind=K_ROW)
-        open_row2 = RowExt("z", Bool, tv2)
-        assert row_union(open_row, open_row2) is None
 
 
 class TestRowOperationsIntegration:

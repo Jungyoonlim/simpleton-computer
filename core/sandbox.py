@@ -6,10 +6,7 @@ untrusted or resource-intensive actions safely.
 """
 
 import os
-import signal
-import subprocess
 import tempfile
-import json
 import multiprocessing as mp
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Callable
@@ -18,8 +15,7 @@ from contextlib import contextmanager
 import threading
 import time
 
-from .runtime import ExecutionContext, ResourceLimits, CapabilityGrant
-from .typesys.types import Type
+from .runtime import ExecutionContext
 
 
 class SandboxError(Exception):

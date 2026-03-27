@@ -9,9 +9,11 @@ import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent))
 
-from core.typesys.types import *
-from core.typesys.effects import *
-from core.typesys.rows import *
+from core.typesys.types import (
+    Doc, Comment, String, List, TVar, is_tvar, unify,
+)
+from core.typesys.effects import EffEmpty, EffExt, collect_effects, effect_union, has_effect
+from core.typesys.rows import RowEmpty, RowExt, collect_row, get_label_type
 from core.actions import list_actions_for, run
 from fileio.files import DocValue
 
@@ -43,7 +45,7 @@ def test_unification():
     
     # Basic unification
     tv_a = TVar("a")
-    tv_b = TVar("b")
+    _tv_b = TVar("b")
     
     # Unify type variable with concrete type
     result1 = unify(tv_a, Doc)

@@ -6,7 +6,7 @@ occurs check, Context unwrapping, and complex unification scenarios.
 """
 import pytest
 from core.typesys.types import (
-    Type, TVar, unify, Int, String, Bool, Float, Top,
+    Type, TVar, unify, Int, String, Bool, Top,
     List, Option, Function, Map, Context
 )
 
@@ -246,7 +246,7 @@ class TestComplexUnificationScenarios:
     def test_nested_containers_with_tvars(self):
         """Test unification of nested containers with type variables."""
         tv_a = TVar("a")
-        tv_b = TVar("b")
+        _tv_b = TVar("b")
         
         # List[Option[a]] vs List[Option[Int]]
         nested1 = List(Option(tv_a))
@@ -267,7 +267,7 @@ class TestComplexUnificationScenarios:
         """Test unification with chained substitutions."""
         tv_a = TVar("a")
         tv_b = TVar("b")
-        tv_c = TVar("c")
+        _tv_c = TVar("c")
         
         # First unification: a ~ b
         result1 = unify(tv_a, tv_b)
@@ -280,7 +280,7 @@ class TestComplexUnificationScenarios:
         
     def test_unification_preserves_existing_substitution(self):
         """Test that unification preserves existing substitutions."""
-        tv_a = TVar("a")
+        _tv_a = TVar("a")
         tv_b = TVar("b")
         existing = {"a": String}
         

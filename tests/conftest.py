@@ -9,9 +9,9 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from core.typesys.types import Type, TVar
-from core.typesys.rows import RowEmpty, RowExt, Rec, Case
-from core.typesys.effects import EffEmpty, EffExt
+from core.typesys.types import TVar  # noqa: E402
+from core.typesys.rows import RowEmpty, RowExt  # noqa: E402
+from core.typesys.effects import EffEmpty, EffExt  # noqa: E402
 
 @pytest.fixture
 def basic_types():

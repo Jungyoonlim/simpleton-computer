@@ -4,7 +4,7 @@ Tests for basic row type construction.
 Tests RowEmpty, RowExt, Rec (record sugar), and Case (variant sugar) constructors.
 """
 import pytest
-from core.typesys.types import Type, Int, String, Bool, Float, Record, Variant
+from core.typesys.types import Type, Int, String, Bool
 from core.typesys.rows import (
     RowEmpty, RowExt, Rec, Case, _assert_row_kind
 )

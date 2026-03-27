@@ -6,7 +6,7 @@ Effect types (IO, Network, UI), and pattern types (Maybe, Either, Stream, Promis
 """
 import pytest
 from core.typesys.types import (
-    Type, Int, String, Bool, Float, Top,
+    Int, String, Bool, Float, Top,
     List, Option, Tuple, Function, Map, Set, Record, Variant, Range, Context,
     IO, Network, UI, Effect,
     Maybe, Either, Stream, Promise

@@ -2,7 +2,7 @@ from __future__ import annotations
 import heapq
 import typing as t 
 
-from core.typesys.types import Type, unify 
+from core.typesys.types import Type 
 from core.actions import list_actions_for
 
 # A* walks the type graph to get from a start type to a goal type using your unify 

@@ -12,9 +12,8 @@ This module provides:
 """
 from __future__ import annotations
 from dataclasses import dataclass
-import typing as t 
 from .kinds import K_ROW 
-from .types import Type, TVar, is_tvar, Record, Variant 
+from .types import Type, is_tvar, Record, Variant 
 
 def _assert_row_kind(t: Type) -> None: 
     assert t.kind == K_ROW, f"expected Row kind, got {t.kind} for {t}"
@@ -117,7 +116,8 @@ def row_union(r1: Type, r2: Type) -> Type | None:
     c2 = collect_row(r2, return_tail=True)
     if not (c1.ok and c2.ok and c1.is_closed() and c2.is_closed()):
         return None 
-    merged = dict(c1.labels); merged.update(c2.labels)
+    merged = dict(c1.labels)
+    merged.update(c2.labels)
     items = sorted(merged.items(), key=lambda kv: kv[0])
     row = RowEmpty()
     for lbl, ty in reversed(items):

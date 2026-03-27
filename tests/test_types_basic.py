@@ -95,7 +95,7 @@ class TestTypeEquality:
         t = Type("Int")
         assert t != "Int"
         assert t != 42
-        assert t != None
+        assert t is not None
 
 
 class TestTypeStringRepresentation:

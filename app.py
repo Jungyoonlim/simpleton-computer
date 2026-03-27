@@ -12,8 +12,8 @@ def summarize(doc):
 
 @register_action("extract_titles", Doc, List(Doc))
 def extract_titles(doc):
-    lines = [l.strip() for l in doc.text.splitlines() if l.strip().startswith("#")]
-    return [type("X", (object,), {"path": doc.path, "text": l}) for l in lines]
+    lines = [line.strip() for line in doc.text.splitlines() if line.strip().startswith("#")]
+    return [type("X", (object,), {"path": doc.path, "text": line}) for line in lines]
 
 def type_name(t: Type) -> str:
     if t.params:

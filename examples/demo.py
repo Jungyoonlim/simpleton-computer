@@ -1,4 +1,4 @@
-from core.typesys.types import Doc, List, Comment, Task, Unit, Option
+from core.typesys.types import List, Task
 from fileio.files import load_doc, load_mixed, print_list
 from core.engine import execute
 from core.plan import plan_and_run

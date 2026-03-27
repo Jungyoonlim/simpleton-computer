@@ -4,9 +4,9 @@ Tests for advanced effect row operations.
 Tests effect_union, effect_eq, and complex effect row scenarios.
 """
 import pytest
-from core.typesys.types import Type, TVar
+from core.typesys.types import Type
 from core.typesys.effects import (
-    EffEmpty, EffExt, collect_effects, effect_union, effect_eq
+    EffEmpty, EffExt, collect_effects, effect_union
 )
 from core.typesys.kinds import K_EFFROW
 
@@ -257,7 +257,7 @@ class TestComplexEffectScenarios:
         
     def test_effect_row_with_function_types(self):
         """Test effect rows used with function types."""
-        from core.typesys.types import Function, Int, String
+        from core.typesys.types import Int, String
         
         empty = EffEmpty()
         io_eff = EffExt("IO", empty)

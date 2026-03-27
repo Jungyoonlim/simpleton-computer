@@ -6,8 +6,7 @@ import pytest
 import time
 from core.runtime import (
     Runtime, ExecutionContext, ResourceLimits, ResourceUsage, 
-    CapabilityGrant, ExecutionState, ResourceExhaustedError, 
-    CapabilityDeniedError, EffectViolationError
+    CapabilityGrant, ExecutionState, CapabilityDeniedError, EffectViolationError
 )
 
 

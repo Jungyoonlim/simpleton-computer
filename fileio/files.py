@@ -67,7 +67,8 @@ def parse_comments(doc: DocValue) -> PyList[CommentValue]:
 # ----- Parsers per tag -----
 def parse_comment(body: str, path: str) -> Optional[CommentValue]:
     m = COMMENT_RE.match(body)
-    if not m: return None
+    if not m:
+        return None
     return CommentValue(
         author=m.group("author").strip(),
         date=m.group("date"),
@@ -77,7 +78,8 @@ def parse_comment(body: str, path: str) -> Optional[CommentValue]:
 
 def parse_task(body: str, path: str) -> Optional[TaskValue]:
     m = TASK_RE.match(body)
-    if not m: return None
+    if not m:
+        return None
     return TaskValue(
         id=m.group("id").strip(),
         status=m.group("status").strip(),
@@ -87,7 +89,8 @@ def parse_task(body: str, path: str) -> Optional[TaskValue]:
 
 def parse_link(body: str, path: str) -> Optional[LinkValue]:
     m = LINK_RE.match(body)
-    if not m: return None
+    if not m:
+        return None
     title = m.group("title")
     if title:
         title = title.strip()
