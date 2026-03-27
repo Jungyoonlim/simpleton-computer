@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 import uuid
-import tempfile
 import typing as t
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
@@ -108,17 +107,14 @@ async def index():
 
 @app.post("/api/load")
 async def load_file(file: UploadFile = File(...)):
-    contents = await file.read()
-    suffix = Path(file.filename).suffix or ".txt"
-    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=suffix, prefix="sc_")
-    tmp.write(contents)
-    tmp.close()
-    dest = Path(tmp.name)
-
+    raw = await file.read()
     try:
-        ty, val = load_doc(str(dest))
+        text = raw.decode("utf-8", errors="replace")
     except Exception as e:
         raise HTTPException(400, detail=str(e))
+
+    ty = Doc
+    val = DocValue(path=file.filename, text=text)
 
     sid = uuid.uuid4().hex[:12]
     sessions[sid] = Session(
