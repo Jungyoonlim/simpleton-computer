@@ -10,7 +10,7 @@ class DocValue:
 
 def load_doc(path: str):
     from core.typesys.types import Doc  # avoid circulars
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, "r", encoding="utf-8", errors="replace") as f:
         return Doc, DocValue(path, f.read())
 
 # --- Domain values ---

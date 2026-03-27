@@ -60,6 +60,9 @@ venv.bak/
 *.swo
 *~
 
+# Uploads (user data, never commit)
+backend/uploads/
+
 # OS
 .DS_Store
 .DS_Store?

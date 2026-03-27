@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from core.typesys.types import Type, Doc, List, Comment, Task, Unit, Option
 from core.typesys.effects import Type as EffectType
 from core.runtime import ExecutionContext, get_runtime, CapabilityDeniedError, EffectViolationError
-from fileio.files import parse_comments, CommentValue, TaskValue, load_mixed
+from fileio.files import parse_comments, CommentValue, TaskValue, load_mixed, load_doc
 
 @dataclass
 class Action: 
@@ -110,11 +110,11 @@ def _wrap_action_with_effect_tracking(fn: t.Callable, context: ExecutionContext,
 @register_action("extract_comments", Doc, List(Comment), effects=["FileSystem"])
 def extract_comments(doc) -> t.List[CommentValue]:
     """Doc -> List[Comment]"""
-    path = getattr(doc, "path", doc)
-    try: 
-        return parse_comments(path)
-    except TypeError:
+    if hasattr(doc, "text") and hasattr(doc, "path"):
         return parse_comments(doc)
+    path = getattr(doc, "path", str(doc))
+    _, dv = load_doc(path)
+    return parse_comments(dv)
 
 @register_action("filter_author_me", List(Comment), List(Comment), effect="pure")
 def filter_author_me(comments: t.List[CommentValue]) -> t.List[CommentValue]:

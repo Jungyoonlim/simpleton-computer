@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simpleton Computer</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>simpleton<span class="dim">computer</span></h1>
+    <p class="subtitle">type-directed computing</p>
+  </header>
+
+  <main>
+    <!-- Drop zone / Load -->
+    <section id="load-section">
+      <div id="drop-zone">
+        <div class="drop-inner">
+          <p class="drop-label">Drop a file here</p>
+          <p class="drop-hint">or</p>
+          <label class="file-btn">
+            Choose file
+            <input type="file" id="file-input" hidden>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Workspace (hidden until file loaded) -->
+    <section id="workspace" class="hidden">
+      <!-- Handle -->
+      <div id="handle-panel">
+        <div class="panel-header">
+          <span class="label">HANDLE</span>
+          <span id="handle-type" class="type-badge"></span>
+        </div>
+        <pre id="handle-value"></pre>
+      </div>
+
+      <!-- Actions -->
+      <div id="actions-panel">
+        <div class="panel-header">
+          <span class="label">ACTIONS</span>
+          <span class="hint" id="action-count"></span>
+        </div>
+        <div id="actions-grid"></div>
+      </div>
+
+      <!-- Plan -->
+      <div id="plan-panel">
+        <div class="panel-header">
+          <span class="label">PLAN</span>
+        </div>
+        <div class="plan-row">
+          <select id="goal-select"></select>
+          <button id="plan-btn">Find path</button>
+        </div>
+        <div id="plan-result" class="hidden"></div>
+      </div>
+
+      <!-- History -->
+      <div id="history-panel">
+        <div class="panel-header">
+          <span class="label">HISTORY</span>
+        </div>
+        <div id="history-trail"></div>
+      </div>
+
+      <button id="reset-btn">Reset</button>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
