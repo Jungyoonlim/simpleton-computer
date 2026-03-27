@@ -119,9 +119,8 @@ def Promise(t_: Type) -> Type:
     return Type("Promise", [t_])
 
 class TVar(Type):
-    def __init__(self, varname: str):
-        # Keep a readable name, but store the logical name separately
-        super().__init__(name=f"TVar({varname})", params=[], metadata={"tvar": varname})
+    def __init__(self, varname: str, kind: str = K_TYPE):
+        super().__init__(name=f"TVar({varname})", params=[], metadata={"tvar": varname}, kind=kind)
 
 def is_tvar(t_: Type) -> bool:
     return isinstance(t_, TVar)
@@ -136,7 +135,7 @@ def occurs(var: str, t: Type, subst: dict) -> bool:
     return any(occurs(var, p, subst) for p in t.params)
 
 # Unification
-def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Union[bool, dict]:
+def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Optional[dict]:
     subst = {} if subst is None else dict(subst)
 
     # Top matches anything
@@ -155,7 +154,7 @@ def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Union[bool, dict]
         if key in subst:
             return unify(subst[key], b, subst)
         if occurs(key, b, subst):
-            return False 
+            return None
         subst[key] = b
         return subst
 
@@ -164,17 +163,17 @@ def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Union[bool, dict]
         if key in subst:
             return unify(a, subst[key], subst)
         if occurs(key, a, subst):
-            return False
+            return None
         subst[key] = a
         return subst
 
     # Names/arity must match
     if a.name != b.name or len(a.params) != len(b.params):
-        return False
+        return None
 
     # Recurse
     for ap, bp in zip(a.params, b.params):
         subst = unify(ap, bp, subst)
-        if subst is False:
-            return False
+        if subst is None:
+            return None
     return subst

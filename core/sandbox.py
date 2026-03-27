@@ -9,7 +9,7 @@ import os
 import tempfile
 import multiprocessing as mp
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Callable
+from typing import Any, Dict, List, Optional, Callable, Union
 from dataclasses import dataclass, field
 from contextlib import contextmanager
 import threading
@@ -68,7 +68,7 @@ class ProcessSandbox:
     with resource limits and restricted capabilities.
     """
     
-    def __init__(self, config: SandboxConfig = None):
+    def __init__(self, config: Optional[SandboxConfig] = None):
         self.config = config or SandboxConfig()
         self._temp_dirs: List[Path] = []
     
@@ -76,7 +76,7 @@ class ProcessSandbox:
         self,
         target_func: Callable,
         args: tuple = (),
-        kwargs: Dict[str, Any] = None,
+        kwargs: Optional[Dict[str, Any]] = None,
         context: Optional[ExecutionContext] = None,
         timeout: float = 30.0
     ) -> SandboxResult:
@@ -319,7 +319,7 @@ class ProcessSandbox:
                 import subprocess
                 subprocess.run = blocked_function
                 subprocess.call = blocked_function
-                subprocess.Popen = blocked_function
+                subprocess.Popen = blocked_function  # type: ignore[misc,assignment]
             except ImportError:
                 pass  # subprocess was already blocked
     
@@ -335,7 +335,7 @@ class ContainerSandbox:
     Provides stronger isolation than process sandbox but requires container runtime.
     """
     
-    def __init__(self, config: SandboxConfig = None, container_image: str = "python:3.11-slim"):
+    def __init__(self, config: Optional[SandboxConfig] = None, container_image: str = "python:3.11-slim"):
         self.config = config or SandboxConfig()
         self.container_image = container_image
     
@@ -343,7 +343,7 @@ class ContainerSandbox:
         self,
         target_func: Callable,
         args: tuple = (),
-        kwargs: Dict[str, Any] = None,
+        kwargs: Optional[Dict[str, Any]] = None,
         context: Optional[ExecutionContext] = None,
         timeout: float = 30.0
     ) -> SandboxResult:
@@ -357,11 +357,15 @@ class ContainerSandbox:
         
         raise NotImplementedError("Container sandbox requires container runtime integration")
 
+    def cleanup(self) -> None:
+        """Clean up container resources (placeholder)."""
+        pass
+
 
 def create_sandbox(
     sandbox_type: str = "process",
-    config: SandboxConfig = None
-) -> ProcessSandbox:
+    config: Optional[SandboxConfig] = None
+) -> Union[ProcessSandbox, ContainerSandbox]:
     """Factory function to create appropriate sandbox."""
     if sandbox_type == "process":
         return ProcessSandbox(config)
@@ -374,7 +378,7 @@ def create_sandbox(
 @contextmanager
 def sandboxed_execution(
     sandbox_type: str = "process",
-    config: SandboxConfig = None,
+    config: Optional[SandboxConfig] = None,
     timeout: float = 30.0
 ):
     """Context manager for sandboxed execution."""

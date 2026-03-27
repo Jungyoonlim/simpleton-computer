@@ -113,7 +113,7 @@ async def load_file(file: UploadFile = File(...)):
         raise HTTPException(400, detail=str(e))
 
     ty = Doc
-    val = DocValue(path=file.filename, text=text)
+    val = DocValue(path=file.filename or "upload.txt", text=text)
 
     sid = uuid.uuid4().hex[:12]
     sessions[sid] = Session(

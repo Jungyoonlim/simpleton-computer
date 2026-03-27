@@ -49,7 +49,7 @@ def list_actions_for(t_: Type) -> dict[str, Action]:
     out: dict[str, Action] = {}
     for name, act in _REGISTRY.items():
         ok = unify(act.input_t, t_)
-        if ok is not False:
+        if ok is not None:
             out[name] = act
     return out 
 

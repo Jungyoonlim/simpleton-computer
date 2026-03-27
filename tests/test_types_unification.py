@@ -22,7 +22,7 @@ class TestBasicUnification:
     def test_different_simple_types(self):
         """Test unification of different simple types fails."""
         result = unify(Int, String)
-        assert result is False
+        assert result is None
         
     def test_top_unifies_with_anything(self):
         """Test that Top unifies with any type."""
@@ -65,7 +65,7 @@ class TestTypeVariableUnification:
         result = unify(tv, tv)
         # The current implementation might fail due to occurs check when a variable
         # is unified with itself. Let's check what actually happens.
-        if result is False:
+        if result is None:
             # Occurs check prevents self-unification, which is a valid implementation choice
             pytest.skip("Implementation prevents TVar self-unification due to occurs check")
         else:
@@ -78,7 +78,7 @@ class TestTypeVariableUnification:
         existing_subst = {"a": Int}
         result = unify(tv, String, existing_subst)
         # Should try to unify Int (from substitution) with String, which fails
-        assert result is False
+        assert result is None
         
     def test_tvar_consistent_substitution(self):
         """Test type variable with consistent existing substitution."""
@@ -97,7 +97,7 @@ class TestOccursCheck:
         tv = TVar("a")
         list_tv = List(tv)
         result = unify(tv, list_tv)
-        assert result is False  # Should fail due to occurs check
+        assert result is None  # Should fail due to occurs check
         
     def test_occurs_check_indirect(self):
         """Test occurs check catches indirect self-reference."""
@@ -111,7 +111,7 @@ class TestOccursCheck:
         
         # Then try to unify b with a, should fail due to occurs check
         result = unify(tv_b, tv_a, subst1)
-        assert result is False
+        assert result is None
         
     def test_occurs_check_through_substitution(self):
         """Test occurs check works through substitution chains."""
@@ -126,7 +126,7 @@ class TestOccursCheck:
         # Try to unify a with b, should fail because:
         # a would unify with b, but b -> c -> List[a], so a occurs in List[a]
         result = unify(tv_a, tv_b, subst)
-        assert result is False
+        assert result is None
 
 
 class TestParameterizedTypeUnification:
@@ -137,7 +137,7 @@ class TestParameterizedTypeUnification:
         list_int = List(Int)
         list_string = List(String)
         result = unify(list_int, list_string)
-        assert result is False
+        assert result is None
         
     def test_same_constructor_same_params(self):
         """Test unification of same constructor with same parameters."""
@@ -159,7 +159,7 @@ class TestParameterizedTypeUnification:
         list_int = List(Int)
         option_int = Option(Int)
         result = unify(list_int, option_int)
-        assert result is False
+        assert result is None
         
     def test_different_arity(self):
         """Test unification of types with different arity fails."""
@@ -167,7 +167,7 @@ class TestParameterizedTypeUnification:
         func = Function(Int, String)
         list_int = List(Int)
         result = unify(func, list_int)
-        assert result is False
+        assert result is None
 
 
 class TestFunctionTypeUnification:
@@ -207,14 +207,14 @@ class TestContextUnwrapping:
         ctx_int = Context(Int)
         result = unify(ctx_int, String)
         # Should unwrap Context(Int) to Int, then fail to unify with String
-        assert result is False
+        assert result is None
         
     def test_context_unwrap_right(self):
         """Test Context unwrapping on right side."""
         ctx_string = Context(String)
         result = unify(Int, ctx_string)
         # Should unwrap Context(String) to String, then fail to unify with Int
-        assert result is False
+        assert result is None
         
     def test_context_unwrap_success(self):
         """Test successful Context unwrapping."""
@@ -299,7 +299,7 @@ class TestComplexUnificationScenarios:
         # Try to unify a with List[Function[a, b]]
         # This should fail due to occurs check
         result = unify(tv_a, list_func)
-        assert result is False
+        assert result is None
 
 
 class TestUnificationEdgeCases:

@@ -5,8 +5,9 @@ Tests for the runtime environment and execution contexts.
 import pytest
 import time
 from core.runtime import (
-    Runtime, ExecutionContext, ResourceLimits, ResourceUsage, 
-    CapabilityGrant, ExecutionState, CapabilityDeniedError, EffectViolationError
+    Runtime, ExecutionContext, ResourceLimits, ResourceUsage,
+    CapabilityGrant, ExecutionState, CapabilityDeniedError, EffectViolationError,
+    RuntimeError as CoreRuntimeError,
 )
 
 
@@ -264,6 +265,6 @@ class TestIntegration:
         
         with context.execution():
             # Should not be able to start another execution
-            with pytest.raises(RuntimeError):
+            with pytest.raises(CoreRuntimeError):
                 with context.execution():
                     pass

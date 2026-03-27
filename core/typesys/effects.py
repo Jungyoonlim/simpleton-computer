@@ -88,7 +88,11 @@ def _split_labels_tail(eff_row: Type) -> Optional[Tuple[Set[str], Optional[Type]
 
     # Traverse the list 
     while current.name == "EffExt":
+        if "effect" not in current.metadata:
+            return None
         labels.add(current.metadata["effect"])
+        if not current.params:
+            return None
         current = current.params[0]
 
     if current.name == "EffEmpty":
@@ -107,7 +111,7 @@ def collect_effects(eff_row: Type) -> set[str] | None:
     if eff_row.kind != K_EFFROW:
         return None
     
-    effects = set()
+    effects: set[str] = set()
     current = eff_row
     
     while True:

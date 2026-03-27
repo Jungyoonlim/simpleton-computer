@@ -86,8 +86,8 @@ class ExecutionContext:
     def __init__(
         self,
         context_id: str,
-        limits: ResourceLimits = None,
-        granted_capabilities: List[CapabilityGrant] = None,
+        limits: Optional[ResourceLimits] = None,
+        granted_capabilities: Optional[List[CapabilityGrant]] = None,
         parent_context: Optional['ExecutionContext'] = None
     ):
         self.context_id = context_id
@@ -177,20 +177,26 @@ class ExecutionContext:
         self._cleanup_callbacks.append(callback)
     
     def _apply_resource_limits(self):
-        """Apply system resource limits."""
-        try:
-            # Memory limit (soft limit)
-            if self.limits.max_memory_mb > 0:
+        """Apply system resource limits where supported."""
+        import platform
+
+        # Memory limit (soft limit) -- RLIMIT_AS is unsupported or restricted on macOS
+        if self.limits.max_memory_mb > 0:
+            try:
                 memory_bytes = self.limits.max_memory_mb * 1024 * 1024
                 resource.setrlimit(resource.RLIMIT_AS, (memory_bytes, memory_bytes))
-            
-            # CPU time limit
-            if self.limits.max_cpu_seconds > 0:
+            except (OSError, ValueError):
+                if platform.system() != "Darwin":
+                    raise
+
+        # CPU time limit
+        if self.limits.max_cpu_seconds > 0:
+            try:
                 cpu_limit = int(self.limits.max_cpu_seconds)
                 resource.setrlimit(resource.RLIMIT_CPU, (cpu_limit, cpu_limit))
-                
-        except (OSError, ValueError) as e:
-            raise RuntimeError(f"Failed to apply resource limits: {e}")
+            except (OSError, ValueError):
+                if platform.system() != "Darwin":
+                    raise
     
     def _check_resource_limits(self):
         """Check if current resource usage exceeds limits."""
@@ -257,8 +263,8 @@ class Runtime:
     
     def create_context(
         self,
-        granted_capabilities: List[CapabilityGrant] = None,
-        limits: ResourceLimits = None,
+        granted_capabilities: Optional[List[CapabilityGrant]] = None,
+        limits: Optional[ResourceLimits] = None,
         parent_context_id: Optional[str] = None
     ) -> str:
         """Create a new execution context."""

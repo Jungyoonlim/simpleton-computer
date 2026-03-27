@@ -6,11 +6,11 @@ def is_container_type(t_: Type) -> bool:
     """Check if a type is a container type"""
     return t_.name in {"List", "Set", "Map", "Option", "Tuple", "Stream"}
 
-def get_element_type(t_: Type) -> bool:
-    """Check if a type is a function type"""
+def get_element_type(t_: Type) -> t.Optional[Type]:
+    """Get the element type of a container type, or None if not a container."""
     if t_.name in {"List", "Set", "Option", "Stream"} and t_.params:
         return t_.params[0]
-    return None 
+    return None
 
 def is_function_type(t_: Type) -> bool: 
     """Check if a type is a function type"""    

@@ -25,7 +25,7 @@ def find_chain(from_t: Type, to_t: Type, toolspace: t.Callable[[Type], dict], ma
     Returns: list[Action] or None
     """
     start = from_t 
-    pq = [(type_distance(start, to_t), 0.0, start, [])]
+    pq: list[tuple[float, float, Type, list[t.Any]]] = [(type_distance(start, to_t), 0.0, start, [])]
     seen: dict[str, float] = {repr(start): 0.0}
 
     while pq: 

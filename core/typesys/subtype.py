@@ -13,12 +13,13 @@ def EffExt(effect: str, tail: Type) -> Type:
     
     """
     assert getattr(tail, "kind", None) == K_EFFROW, ""
+    return Type("EffExt", [tail], metadata={"effect": effect}, kind=K_EFFROW)
 
 def _flatten_effect_row(): 
     return 
 
 def _effect_row_subtype() -> bool: 
-    return 
+    return False
 
 def _nominal_leq():
     return 
