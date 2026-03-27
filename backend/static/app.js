@@ -17,6 +17,9 @@ async function api(path, opts = {}) {
 const dropZone = $("#drop-zone");
 const fileInput = $("#file-input");
 
+document.addEventListener("dragover", (e) => e.preventDefault());
+document.addEventListener("drop", (e) => e.preventDefault());
+
 dropZone.addEventListener("dragover", (e) => {
   e.preventDefault();
   dropZone.classList.add("over");
@@ -25,9 +28,10 @@ dropZone.addEventListener("dragleave", () => dropZone.classList.remove("over"));
 dropZone.addEventListener("drop", (e) => {
   e.preventDefault();
   dropZone.classList.remove("over");
-  if (e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0]);
+  const files = e.dataTransfer.files;
+  if (files && files.length) uploadFile(files[0]);
 });
-dropZone.addEventListener("click", () => fileInput.click());
+
 fileInput.addEventListener("change", () => {
   if (fileInput.files.length) uploadFile(fileInput.files[0]);
 });

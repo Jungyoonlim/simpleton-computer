@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simpleton Computer</title>
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css?v=4">
 </head>
 <body>
   <header>
@@ -16,14 +16,9 @@
     <!-- Drop zone / Load -->
     <section id="load-section">
       <div id="drop-zone">
-        <div class="drop-inner">
-          <p class="drop-label">Drop a file here</p>
-          <p class="drop-hint">or</p>
-          <label class="file-btn">
-            Choose file
-            <input type="file" id="file-input" hidden>
-          </label>
-        </div>
+        <p class="drop-label">Drop a file here</p>
+        <p class="drop-hint">or click to browse</p>
+        <input type="file" id="file-input" class="file-input-overlay">
       </div>
     </section>
 
@@ -71,6 +66,6 @@
     </section>
   </main>
 
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=4"></script>
 </body>
 </html>
