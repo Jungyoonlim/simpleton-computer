@@ -4,6 +4,17 @@ from dataclasses import dataclass, field
 import typing as t  
 from .kinds import K_TYPE
 
+# Metadata keys that are part of a term's identity. In the free algebra,
+# RowExt_ℓ and EffExt_ℓ are families of constructors indexed by a label, so
+# the label belongs to the head symbol: {x: Int} ≠ {y: Int}, {Send} ≠ {Read}.
+# All other metadata (carriers, descriptions) stays out of equality.
+STRUCTURAL_KEYS = ("label", "effect")
+
+
+def _structural(md: t.Dict[str, t.Any]) -> tuple:
+    return tuple(md.get(k) for k in STRUCTURAL_KEYS)
+
+
 @dataclass(frozen=True)
 class Type:
     """
@@ -37,10 +48,11 @@ class Type:
         if not isinstance(other, Type):
             return False
         return (self.name == other.name and
+                _structural(self.metadata) == _structural(other.metadata) and
                 self.params == other.params)
 
     def __hash__(self):
-        return hash((self.name, tuple(self.params)))
+        return hash((self.name, _structural(self.metadata), tuple(self.params)))
 
 # Base Types
 Unit = Type("Unit")
@@ -149,6 +161,11 @@ def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Optional[dict]:
         return unify(a, b.params[0], subst)
 
     # --- Type variables ---
+    # Delete rule: α ≐ α is already solved. Without this the occurs check
+    # rejects it, and no polymorphic arrow a → a could ever be used.
+    if is_tvar(a) and is_tvar(b) and a.metadata["tvar"] == b.metadata["tvar"]:
+        return subst
+
     if is_tvar(a):
         key = a.metadata["tvar"]
         if key in subst:
@@ -169,6 +186,8 @@ def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Optional[dict]:
 
     # Names/arity must match
     if a.name != b.name or len(a.params) != len(b.params):
+        return None
+    if _structural(a.metadata) != _structural(b.metadata):
         return None
 
     # Recurse

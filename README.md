@@ -2,6 +2,18 @@
 
 A prototype of type-directed computing 
 
+## Oct 18 — the world engine
+
+A world of typed things that you and an agent share. Tools gather around each
+thing by its kind; changing arrows make new versions, making arrows make new
+things that remember where they came from; every change is in an append-only
+log; the agent works freely when it only adds and asks when it would touch your
+things or reach outside. No model anywhere yet. See [docs/WORLD.md](docs/WORLD.md).
+
+```bash
+uv run python -m examples.world_demo
+```
+
 ## Aug 17 
 Takes a piece of data, checks its type, shows only the actions that make sense for that type. 
 

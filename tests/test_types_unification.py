@@ -63,14 +63,10 @@ class TestTypeVariableUnification:
         """Test same type variable unifies with itself."""
         tv = TVar("a")
         result = unify(tv, tv)
-        # The current implementation might fail due to occurs check when a variable
-        # is unified with itself. Let's check what actually happens.
-        if result is None:
-            # Occurs check prevents self-unification, which is a valid implementation choice
-            pytest.skip("Implementation prevents TVar self-unification due to occurs check")
-        else:
-            # Should be empty substitution or self-binding
-            assert result == {} or result == {"a": tv}
+        # Delete rule: α ≐ α is trivially solved, with no binding needed.
+        assert result == {}
+        # ...and it must not trip the occurs check inside bigger terms
+        assert unify(List(tv), List(tv)) == {}
         
     def test_tvar_with_existing_substitution(self):
         """Test type variable unification with existing substitution."""
@@ -332,3 +328,22 @@ class TestUnificationEdgeCases:
 
 if __name__ == "__main__":
     pytest.main([__file__])
+
+
+class TestLabelsAreStructural:
+    """Row and effect labels are part of a type's identity, not loose metadata."""
+
+    def test_records_with_different_labels_differ(self):
+        from core.typesys.rows import Rec
+        assert Rec(a=Int) != Rec(b=Int)
+        assert unify(Rec(a=Int), Rec(b=Int)) is None
+        assert unify(Rec(a=Int), Rec(a=Int)) == {}
+
+    def test_effect_rows_with_different_labels_differ(self):
+        from core.typesys.effects import EffExt, EffEmpty
+        send, read = EffExt("Send", EffEmpty()), EffExt("Read", EffEmpty())
+        assert send != read
+        assert unify(send, read) is None
+
+    def test_other_metadata_still_ignored(self):
+        assert Type("Int", metadata={"py": int}) == Type("Int", metadata={"description": "x"})

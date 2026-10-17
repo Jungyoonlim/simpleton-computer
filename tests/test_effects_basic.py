@@ -6,7 +6,7 @@ Tests EffEmpty, EffExt, collect_effects, has_effect, and basic effect row functi
 import pytest
 from core.typesys.types import Type
 from core.typesys.effects import (
-    EffEmpty, EffExt, collect_effects, has_effect, _mk_row_from_labels
+    EffEmpty, EffExt, collect_effects, has_effect, _mk_row_from_labels, normalize_row
 )
 from core.typesys.kinds import K_EFFROW
 
@@ -77,10 +77,9 @@ class TestEffExt:
         ext3 = EffExt("Network", empty)  # different effect
         
         assert ext1 == ext2
-        # NOTE: Current Type equality implementation doesn't consider metadata,
-        # so ext1 and ext3 are considered equal even though they have different effects
-        # This is a limitation of the current type system implementation
-        assert ext1 == ext3  # They have same name and params, different metadata is ignored
+        # The effect label is part of the term's identity: {IO} ≠ {Network}
+        assert ext1 != ext3
+        assert hash(ext1) != hash(ext3)
         
     def test_eff_ext_different_tails(self):
         """Test EffExt with different tails."""
@@ -272,10 +271,10 @@ class TestEffectRowEquality:
         eff1 = EffExt("IO", EffExt("Network", empty))
         eff2 = EffExt("Network", EffExt("IO", empty))
         
-        # Both have name "EffExt" and one parameter, so they're structurally equal
-        # even though they represent different effect orders
-        # This demonstrates the limitation of current Type equality
-        assert eff1 == eff2  # Structural equality despite different semantics
+        # As raw terms, different orders are different; normalize_row
+        # canonicalizes them to the same term.
+        assert eff1 != eff2
+        assert normalize_row(eff1) == normalize_row(eff2)
         
     def test_subset_effect_rows_unequal(self):
         """Test that subset effect rows are unequal."""

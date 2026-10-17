@@ -79,8 +79,8 @@ class TestRowExt:
         ext4 = RowExt("x", String, empty)  # different type
         
         assert ext1 == ext2
-        # Due to Type equality limitation, ext1 and ext3 are equal (same name/params, different metadata)
-        assert ext1 == ext3  # Metadata differences ignored
+        # The row label is part of the term's identity: {x: Int} ≠ {y: Int}
+        assert ext1 != ext3
         assert ext1 != ext4  # Different type parameters
 
 
