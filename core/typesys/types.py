@@ -161,6 +161,11 @@ def unify(a: Type, b: Type, subst: t.Optional[dict]=None) -> t.Optional[dict]:
         return unify(a, b.params[0], subst)
 
     # --- Type variables ---
+    # Delete rule: α ≐ α is already solved. Without this the occurs check
+    # rejects it, and no polymorphic arrow a → a could ever be used.
+    if is_tvar(a) and is_tvar(b) and a.metadata["tvar"] == b.metadata["tvar"]:
+        return subst
+
     if is_tvar(a):
         key = a.metadata["tvar"]
         if key in subst:
