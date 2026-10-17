@@ -6,7 +6,7 @@ Tests effect_union, effect_eq, and complex effect row scenarios.
 import pytest
 from core.typesys.types import Type
 from core.typesys.effects import (
-    EffEmpty, EffExt, collect_effects, effect_union
+    EffEmpty, EffExt, collect_effects, effect_union, effect_eq, normalize_row
 )
 from core.typesys.kinds import K_EFFROW
 
@@ -188,8 +188,8 @@ class TestEffectEq:
         eff1 = EffExt("IO", empty)
         eff2 = EffExt("Network", empty)
         
-        # Due to Type equality limitation, these are considered equal
-        assert eff1 == eff2
+        assert eff1 != eff2
+        assert not effect_eq(eff1, eff2)
         
     def test_effect_eq_same_effects_different_order(self):
         """Test equality ignoring order (semantic equality)."""
@@ -203,9 +203,11 @@ class TestEffectEq:
         effects2 = collect_effects(eff2)
         assert effects1 == effects2
         
-        # Due to Type equality limitation, these are structurally equal
-        # even though they represent different effect orders
-        assert eff1 == eff2  # Current structural equality
+        # As raw terms the two orders differ; as effect sets they are equal.
+        # normalize_row gives the canonical term, and effect_eq the set view.
+        assert eff1 != eff2
+        assert normalize_row(eff1) == normalize_row(eff2)
+        assert effect_eq(eff1, eff2)
         
     def test_effect_eq_subset_effects(self):
         """Test inequality of subset effect rows."""

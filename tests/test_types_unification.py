@@ -332,3 +332,22 @@ class TestUnificationEdgeCases:
 
 if __name__ == "__main__":
     pytest.main([__file__])
+
+
+class TestLabelsAreStructural:
+    """Row and effect labels are part of a type's identity, not loose metadata."""
+
+    def test_records_with_different_labels_differ(self):
+        from core.typesys.rows import Rec
+        assert Rec(a=Int) != Rec(b=Int)
+        assert unify(Rec(a=Int), Rec(b=Int)) is None
+        assert unify(Rec(a=Int), Rec(a=Int)) == {}
+
+    def test_effect_rows_with_different_labels_differ(self):
+        from core.typesys.effects import EffExt, EffEmpty
+        send, read = EffExt("Send", EffEmpty()), EffExt("Read", EffEmpty())
+        assert send != read
+        assert unify(send, read) is None
+
+    def test_other_metadata_still_ignored(self):
+        assert Type("Int", metadata={"py": int}) == Type("Int", metadata={"description": "x"})
